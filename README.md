@@ -93,3 +93,6 @@ By default program uses __Roboto__ font, but you can specify different __TTF__ f
 ```
 watermarker --input=input_image.jpg --output=output_image.jpg --wtext Test --wpos U --wposm 100 --wcolor=red --wfsize=32 --wfont="fonts/Roboto-Regular.ttf"
 ```
+
+## Watermark images in directory
+What is different ? Just specify directories instead of files, script will recursively search for images and watermark them by paramaters you set.
