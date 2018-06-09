@@ -38,7 +38,29 @@ You can use this script without installing it. You can run __binary file__ (.exe
 Here are some examples that will help you start. Note that there are different way to call _watermarker_ script, examples use `watermarker.exe`.
 
 ## Arguments
-
+|__Argument__|__Description__|
+|:----------:|:--------------|
+|-h,--help|Prints help|
+|-V,--version|Prints version|
+|-v,--verbose|Enables verbose mode|
+|-i `<path>`,--input=`<path>`|Path of input file or directory|
+|-o `<path>`,--output=`<path>`|Path of output file or directory, if input is file, then output also must be file, same for directory|
+|-O,--overwrite|Automaticly overwrite existing files|
+|--width=`<new width>`|Resize image to new width|
+|--height=`<new height>`|Resize image to new height|
+|--preview|Show image before saving|
+|--ask-to-save|Ask if we want image to be saved|
+|--wpos=`<corner>`|Set corner where watermark will be, available corners LU - LeftUpperCorner,L - LeftCorner, LD - LeftDownCorner,RU - RightUpperCorner,R - RightCorner,RD - RightDownCorner, U - UpperCorner,D - DownCorner|
+|--wposm=`<margin_px>`|Set margin from border for logo in px, use with `--wpos`|
+|--wposx=`<x_coord_px>`|X coordinate of watermark position|
+|--wposy=`<y_coord_px>`|Y coordinate of watermark position|
+|--wimage=`<image_path>`|Path to watermark image|
+|--wwidth=`<new width>`|Resize watermark to new width|
+|--wheight=`<new height>`|Resize watermark to new height|
+|--wtext=`<watermark text>`|Watermark text|
+|--wcolor=`<text color>`|Text color, valid formats are `#rrggbb`,`rgb(r,g,b)`,`#rgb`,`hsl(hue,saturation%,lightness%)`,`color_name`|
+|--wfont=`<path_to_ttf>`|Path to font file|
+|--wfsize=`<font size pt>`|Text font size|
 
 ## Print version
 ```
