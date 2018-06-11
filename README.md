@@ -1,3 +1,5 @@
+<div style="text-align:center;"><img src="img/logo.png"></div>
+
 # Introduction
 
 The __watermarker__ script provides a convenient way to __watermark__ more than one image. It was created to make easier to watermark images, because it can take a lot of time

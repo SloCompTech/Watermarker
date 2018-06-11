@@ -59,5 +59,6 @@ target/
 
 # Test images & files
 hide_*
-*.jpg
-*.png
+image*.jpg
+out_*.jpg
+*watermark*.png
