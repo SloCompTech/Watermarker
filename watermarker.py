@@ -2,7 +2,7 @@
 # Watermarker - program for watermarking images
 #
 
-PROG_VERSION = '1.1'
+PROG_VERSION = '1.2'
 
 IMG_ALLOWED_EXT = ['jpg','png'] # Supported image extentions
 IMG_TXT_DEFAULT_COLOR = 'black' # Default color for text
