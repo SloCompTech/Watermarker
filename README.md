@@ -75,23 +75,23 @@ watermarker --help
 ## Watermark image with image (basic example - choose corner)
 Here is basic example. We set input file and output file which can be omitted, then it would overwrite input file. We also set watermark which can be image (`--wimage`) or text (`--wtext`). We must also specify position of watermark. We set in which corner watermark should be with `--wpos` and margins from borders with `--wposm`. Watermark images show be PNG in RGBA format if posible.
 ```
-watermarker --input=input_image.jpg --output=output_image.jpg --wimage watermark_image.png --wpos=LD --wposm 10
+watermarker --input=input_image.jpg --output=output_image.jpg --wimage watermark_image.png --wpos=LD --wposm 10 --verbose
 ```
 
 ## Watermark image with image (extended example - choose position)
 What is different to previous example is that here we specify absolute position of watermark with `--wposx` and `--wposy`. Note that x=0,y=0 is in left upper corner.
 ```
-watermarker --input=input_image.jpg --output=output_image.jpg --wimage watermark_image.png --wposx=10 --wposy=10
+watermarker --input=input_image.jpg --output=output_image.jpg --wimage watermark_image.png --wposx=10 --wposy=10 --verbose
 ```
 ## Watermark image with text (basic example)
 Here we watermark images with text instead of images. We use `--wtext`. We can also change color of text with `--wcolor`. We can specify color in differen formats eg. `red`,`#ff0000`,`rgb(255,0,0)` and more. Also there is option to change text size `--wfsize`.
 ```
-watermarker --input=input_image.jpg --output=output_image.jpg --wtext Test --wpos U --wposm 100 --wcolor=red --wfsize=32
+watermarker --input=input_image.jpg --output=output_image.jpg --wtext Test --wpos U --wposm 100 --wcolor=red --wfsize=32 --verbose
 ```
 ## Watermark image with text (extended example)
 By default program uses __Roboto__ font, but you can specify different __TTF__ file with `--wfont`.
 ```
-watermarker --input=input_image.jpg --output=output_image.jpg --wtext Test --wpos U --wposm 100 --wcolor=red --wfsize=32 --wfont="fonts/Roboto-Regular.ttf"
+watermarker --input=input_image.jpg --output=output_image.jpg --wtext Test --wpos U --wposm 100 --wcolor=red --wfsize=32 --wfont="fonts/Roboto-Regular.ttf" --verbose
 ```
 
 ## Watermark images in directory

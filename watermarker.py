@@ -33,9 +33,21 @@ class RelativePosition(Enum):
     UPPER_CORNER = 'U'
     DOWN_CORNER = 'D'
 
+# Globals
+g_log_file = None # Log file
+
 # Functions
 def stack_trace(obj):
     pprint(vars(obj))
+def lprint(*objects, sep=' ', end='\n', file=sys.stdout, flush=False): # Custom version of print
+    if args is not None:
+        if args.verbose is not None and args.verbose:
+            print(*objects, sep=sep, end=end, file=file, flush=flush)
+        if g_log_file is not None and not g_log_file.closed:
+            print(*objects, sep=sep, end=end, file=g_log_file, flush=flush)
+        
+        
+
 def aquire_args():
     global args
 
@@ -47,7 +59,7 @@ def aquire_args():
     parser.add_argument('-o', '--output', type=str, help='Sets path for output file or directory.')
     #parser.add_argument('-r', '--recursive', action='store_true', help='Enables recursive mode for directory.')
     parser.add_argument('-O', '--overwrite', action='store_true', help='Overwrites exsisting files / dirs.')
-    #parser.add_argument('-l','--log-file', help='Sets path for log file.')
+    parser.add_argument('-l','--log-file', help='Sets path for log file.')
 
     # Image option
     parser.add_argument('--width',type=int,help='Resize the width of the image to <width>.')
@@ -168,26 +180,36 @@ def resize_image(image,width=None,height=None,allowRatioChange=False):
             raise Exception(12,"Picture ratio may change")
     else:
         raise Exception(13,"Invalid arguments for resizing")
+
+    lprint("Resizing image from W:%i H:%i to W:%i H:%i" % (orig_width,orig_height,width,height))
     return image.resize((width,height),Image.BICUBIC)
 def make_text_img():
+    text_size = (IMG_TXT_DEFAULT_SIZE if args.wfsize is None else args.wfsize)
+    text_font = (IMG_TXT_DEFAULT_FONT if args.wfont is None else args.wfont)
+    text_color = (IMG_TXT_DEFAULT_COLOR if args.wcolor is None else args.wcolor)
+
+    lprint("Generating text image (text:'%s', color:'%s', font:'%s', size:'%i)'" % (args.wtext,text_color,text_font,text_size))
+
     # Load font if specified else use default font
-    font_obj = ImageFont.truetype((IMG_TXT_DEFAULT_FONT if args.wfont is None else args.wfont),(IMG_TXT_DEFAULT_SIZE if args.wfsize is None else args.wfsize))
+    font_obj = ImageFont.truetype(text_font,text_size)
     
     # Create watermark
     t_w,t_h = font_obj.getsize(args.wtext)
     text_img = Image.new('RGBA',(t_w,t_h))
     img_draw = ImageDraw.Draw(text_img)
-    img_draw.text((0,0),args.wtext,fill=(IMG_TXT_DEFAULT_COLOR if args.wcolor is None else args.wcolor),font=font_obj)
+    img_draw.text((0,0),args.wtext,fill=text_color,font=font_obj)
 
     return text_img
 
 def load_image(path):
-    print("Loading file %s" % (path))
+    lprint("Loading image %s" % (path))
     im = Image.open(path)
     im_safe = im.copy()
     im.close()
+    lprint("Image %s loaded" % (path))
     return im_safe
 def watermark_image_image(base_img,watermark_img,watermark_position):
+    lprint("Applying watermark")
     b_width, b_height = base_img.size
     transparent = Image.new('RGBA', (b_width, b_height), (0, 0, 0, 0))
     transparent.paste(base_img, (0, 0))
@@ -201,6 +223,7 @@ def process_image(base_img,watermark_img):
         ask_result = False
         if args.width is not None and args.height is not None:
             ask_result = ask(True,"Picture ratio may change. Continue anyway ?")
+        
         base_img = resize_image(base_img,args.width,args.height,ask_result)
     
     # Get sizes
@@ -257,6 +280,9 @@ def process_image(base_img,watermark_img):
     # Check if watermark will fit image in offset position
     if watermark_w + pos_w > base_w or watermark_h + pos_h > base_h:
          raise Exception(16,"Watermark does not fit in the picture")
+
+    lprint("Watermark position: X:%i Y:%i Margin:%i" % (pos_w,pos_h,margin))
+
     new_img = watermark_image_image(base_img,watermark_img,(pos_w,pos_h))
 
     return new_img
@@ -271,7 +297,7 @@ def process_file(input_path,output_path,watermark_img,delete_input_file_on_load)
         raise Exception(42,"Watermark image not set")
 
     # Load image
-    print("Opening image %s" % (input_path))
+    lprint("Opening image %s" % (input_path))
     input_img = load_image(input_path) # Load input image
     
     # Process image
@@ -295,12 +321,14 @@ def process_file(input_path,output_path,watermark_img,delete_input_file_on_load)
             elif os.path.isdir(output_path):
                 os.removedirs(output_path)
         new_img.save(output_path)
-        print("New image saved to %s" % (output_path))
+        lprint("New image saved to %s" % (output_path))
     
     # Clean resources
     new_img.close()
     input_img.close()
 def get_watermark():
+    lprint("Getting watermark")
+
     watermark_img = None
     if args.wimage is not None:
         watermark_img = load_image(args.wimage)
@@ -316,10 +344,15 @@ def get_watermark():
     return watermark_img
 # Main program
 def main():
+    global g_log_file
     try:
         aquire_args()
         check_args()
     
+        # Open log file if requested
+        if args.log_file is not None and len(args.log_file) > 0:
+            g_log_file = open(args.log_file,"a")
+
         # Load resources
         watermark_img = get_watermark()
 
@@ -350,7 +383,7 @@ def main():
                         new_rel_dir_path = args.output + os.sep + rel_root + (os.sep if len(rel_root) > 0 else "") + dir_name
                         if not os.path.exists(new_rel_dir_path):
                             os.makedirs(new_rel_dir_path) # Create subdirectory
-                            print("Creating directories %s ..." % (dir_name))
+                            lprint("Creating directories %s ..." % (dir_name))
                         
                     # Process files in each directory
                     for file_name in files:
@@ -362,7 +395,7 @@ def main():
                         if file_ext in IMG_ALLOWED_EXT: # File extention in allowed list to process as image
                             process_file(old_rel_file_path,new_rel_file_path,watermark_img,False)
                         else:
-                            print("Copying normal file %s ..." % (file_name))
+                            lprint("Copying normal file %s ..." % (file_name))
                             shutil.copy2(old_rel_file_path,new_rel_file_path) 
             else: # Output is NOT set, save in Input directory, overwrite exsisting images
                 for root, dirs, files in os.walk(args.input): # For each directory 
@@ -377,17 +410,22 @@ def main():
         # Clean resource
         watermark_img.close()
         
-    except (Exception,SystemExit) as e:
+    except (Exception,SystemExit,IOError) as e:
         if len(e.args) >= 2:
-            print(e.args[1] + " (Error code: %i)" % (e.args[0]))
+            lprint(e.args[1] + " (Error code: %i)" % (e.args[0]))
         if len(e.args) >= 1:
             sys.exit(e.args[0])
     except:
-        print('Unexpected error: ',sys.exc_info()[0])
+        lprint('Unexpected error: ',sys.exc_info()[0])
         raise
 
+    try:
+        if g_log_file is not None and not g_log_file.closed:
+            g_log_file.close()
+    except (IOError):
+        pass
 if __name__ == "__main__":
     main()
 else:
-    print("Script not run properly")
+    lprint("Script not run properly")
     sys.exit(1)
