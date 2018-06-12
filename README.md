@@ -5,6 +5,8 @@
 The __watermarker__ script provides a convenient way to __watermark__ more than one image. It was created to make easier to watermark images, because it can take a lot of time
 if you have more than one image.
 
+# Video tutorial
+[![Video tutorial](https://i.ytimg.com/vi/RNO5Guy1tb4/hqdefault.jpg?sqp=-oaymwEZCPYBEIoBSFXyq4qpAwsIARUAAIhCGAFwAQ==&rs=AOn4CLBuZTO9ZvgHa3szeAnM7-eZJX88Bg)](https://www.youtube.com/watch?v=RNO5Guy1tb4 "Video Tutorial")
 # Installation
 ## Use out of the box
 You can use this script without installing it. You can run __binary file__ (.exe) or __source file__ (.py).
