@@ -1,4 +1,4 @@
-<div style="text-align:center;"><img src="img/logo.png"></div>
+<p align="center"><img src="img/1024px.png" alt="Watermarker" height="200px"></p>
 
 # Introduction
 
