@@ -50,6 +50,7 @@ Here are some examples that will help you start. Note that there are different w
 |-i `<path>`,--input=`<path>`|Path of input file or directory|
 |-o `<path>`,--output=`<path>`|Path of output file or directory, if input is file, then output also must be file, same for directory|
 |-O,--overwrite|Automaticly overwrite existing files|
+|--allowext=`<extension1>,<extension2>`|Select file extensions which files will be watermarked. By default png and jpg.|
 |--width=`<new width>`|Resize image to new width|
 |--height=`<new height>`|Resize image to new height|
 |--preview|Show image before saving|

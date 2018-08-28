@@ -4,7 +4,7 @@
 
 PROG_VERSION = '1.2'
 
-IMG_ALLOWED_EXT = ['jpg','png'] # Supported image extentions
+IMG_ALLOWED_EXT = ['jpg','png'] # Supported image extentions (in lowercase !!)
 IMG_TXT_DEFAULT_COLOR = 'black' # Default color for text
 IMG_TXT_DEFAULT_FONT = 'fonts/Roboto-Regular.ttf' # Default text font
 IMG_TXT_DEFAULT_SIZE = 70 # Default text size
@@ -60,7 +60,8 @@ def aquire_args():
     #parser.add_argument('-r', '--recursive', action='store_true', help='Enables recursive mode for directory.')
     parser.add_argument('-O', '--overwrite', action='store_true', help='Overwrites exsisting files / dirs.')
     parser.add_argument('-l','--log-file', help='Sets path for log file.')
-
+    parser.add_argument('--allowext', type=str, help='List of image extensions to watermark separated with comma. (default: jpg, png)')
+	
     # Image option
     parser.add_argument('--width',type=int,help='Resize the width of the image to <width>.')
     parser.add_argument('--height', type=int, help='Resize the height of the image to <height>.')
@@ -114,7 +115,12 @@ def check_args(): # Check if arguments are valid
             raise Exception(7,"Output is not a file")
         if os.path.isdir(args.input) and want_file:
             raise Exception(8,"Output is not a directory")
-
+	
+    # Check arg: allowext
+    global IMG_ALLOWED_EXT
+    if args.allowext is not None:
+        IMG_ALLOWED_EXT = args.allowext.lower().split(',')
+		
     # Check arg: watermark or watermark text specified
     if args.wimage is None and args.wtext is None:
         raise Exception(9,"Watermark not specified.")
@@ -160,6 +166,7 @@ def check_args(): # Check if arguments are valid
             raise Exception(19,"Argument --wfsize can only be used with --wtext")
         if args.wfsize < 1:
             raise Exception(20,"Invalid font size")
+			
 def ask(default_value,message):
     print(message + " [" + ("Y" if default_value else "y") + "/" + ("n" if default_value else "N") + "]:",end='')
     i = input().lower()
@@ -392,7 +399,7 @@ def main():
                         if os.path.exists(new_rel_file_path): # Remove old file
                             os.remove(new_rel_file_path)
                         file_ext = (file_name.split('.'))[-1]
-                        if file_ext in IMG_ALLOWED_EXT: # File extention in allowed list to process as image
+                        if file_ext.lower() in IMG_ALLOWED_EXT: # File extention in allowed list to process as image
                             process_file(old_rel_file_path,new_rel_file_path,watermark_img,False)
                         else:
                             lprint("Copying normal file %s ..." % (file_name))
