@@ -2,7 +2,7 @@
 # Watermarker - program for watermarking images
 #
 
-PROG_VERSION = '1.2'
+PROG_VERSION = '1.22'
 
 IMG_ALLOWED_EXT = ['jpg','png'] # Supported image extentions (in lowercase !!)
 IMG_TXT_DEFAULT_COLOR = 'black' # Default color for text
@@ -16,6 +16,7 @@ import os
 import shutil
 from enum import Enum
 from pprint import pprint
+import functools
 
 try:
     from PIL import Image, ImageDraw, ImageFont
@@ -176,6 +177,37 @@ def ask(default_value,message):
         return True
     else:
         return default_value
+
+def image_transpose_exif(im):
+    """
+        Apply Image.transpose to ensure 0th row of pixels is at the visual
+        top of the image, and 0th column is the visual left-hand side.
+        Return the original image if unable to determine the orientation.
+
+        As per CIPA DC-008-2012, the orientation field contains an integer,
+        1 through 8. Other values are reserved.
+    """
+
+    exif_orientation_tag = 0x0112
+    exif_transpose_sequences = [                   # Val  0th row  0th col
+        [],                                        #  0    (reserved)
+        [],                                        #  1   top      left
+        [Image.FLIP_LEFT_RIGHT],                   #  2   top      right
+        [Image.ROTATE_180],                        #  3   bottom   right
+        [Image.FLIP_TOP_BOTTOM],                   #  4   bottom   left
+        [Image.FLIP_LEFT_RIGHT, Image.ROTATE_90],  #  5   left     top
+        [Image.ROTATE_270],                        #  6   right    top
+        [Image.FLIP_TOP_BOTTOM, Image.ROTATE_90],  #  7   right    bottom
+        [Image.ROTATE_90],                         #  8   left     bottom
+    ]
+
+    try:
+        seq = exif_transpose_sequences[im._getexif()[exif_orientation_tag]]
+    except Exception:
+        return im
+    else:
+        return functools.reduce(type(im).transpose, seq, im)
+
 def resize_image(image,width=None,height=None,allowRatioChange=False):
     orig_width,orig_height = image.size
     if width is not None and height is None: # Resize base on width
@@ -211,6 +243,7 @@ def make_text_img():
 def load_image(path):
     lprint("Loading image %s" % (path))
     im = Image.open(path)
+    im = image_transpose_exif(im)
     im_safe = im.copy()
     im.close()
     lprint("Image %s loaded" % (path))
@@ -286,7 +319,7 @@ def process_image(base_img,watermark_img):
 
     # Check if watermark will fit image in offset position
     if watermark_w + pos_w > base_w or watermark_h + pos_h > base_h:
-         raise Exception(16,"Watermark does not fit in the picture")
+        raise Exception(16,"Watermark does not fit in the picture")
 
     lprint("Watermark position: X:%i Y:%i Margin:%i" % (pos_w,pos_h,margin))
 
